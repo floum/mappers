@@ -1,15 +1,15 @@
 class DictMapper:
-    def __init__(self, map_=None, keys=lambda x: x, values=lambda x: x):
+    def __init__(self, map_=None, default=None):
         self.map_ = map_ or {}
-        self.keys = keys
-        self.values = values
-
+        self.default = default or (lambda x: x, lambda x: x)
+        
     def map(self, dictionary):
         return dict(
-            self._map_item(key, value)
-            for key, value in dictionary.items()
+            self._map_item((key, value))
+            for (key, value) in dictionary.items()
         )
 
-    def _map_item(self, key, value):
-        mapping = self.map_.get(key, (self.keys, self.values))
-        return (mapping[0](key), mapping[1](value))
+    def _map_item(self, *items):
+        mapping = self.map_.get(items[0], self.default)
+#        import pdb; pdb.set_trace()
+        return (map_(element) for (map_, element) in zip(mapping, items))
